@@ -1,0 +1,72 @@
+let searchInputEl = document.getElementById("searchInput");
+let bookContainerEl = document.getElementById("bookContainer");
+let searchResultsEl = document.getElementById("searchResults");
+let spinner = document.getElementById("spinner");
+
+function createAndAppendResult(result) {
+    let {
+        title,
+        imageLink,
+        author
+    } = result;
+    console.log(author);
+
+    let imageEl = document.createElement("img");
+    imageEl.src = imageLink;
+    //imageEl.classList.add("col-12")
+    searchResultsEl.appendChild(imageEl);
+
+    let authorEl = document.createElement("p");
+    authorEl.textContent = author;
+    authorEl.classList.add("mt-3");
+    searchResultsEl.appendChild(authorEl);
+
+}
+
+function displaySearchResult(search_results) {
+    for (let result of search_results) {
+        createAndAppendResult(result);
+    }
+}
+
+
+function gettingTheResponse(event) {
+    let searchInputVl = searchInputEl.value;
+    if (event.key === "Enter") {
+        let url = "https://apis.ccbp.in/book-store?title=" + searchInputVl;
+        let options = {
+            method: "GET"
+        };
+
+        spinner.classList.toggle("d-none");
+
+        fetch(url, options)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(jsonData) {
+
+                let headingEl = document.createElement("h1");
+                headingEl.style.fontSize = "35px";
+                searchResultsEl.appendChild(headingEl);
+
+                if (searchInputVl === "" && event.key === "Enter") {
+                    headingEl.textContent = "No results found";
+                } else {
+                    headingEl.textContent = "Popular Books";
+                }
+
+                console.log(jsonData);
+                let {
+                    search_results
+                } = jsonData;
+                displaySearchResult(search_results);
+
+            });
+
+    }
+
+}
+
+
+searchInputEl.addEventListener("keydown", gettingTheResponse);
